@@ -1,5 +1,9 @@
 import os
 
+os.system("python3 -m venv /tmp/arch-mojo/venv")
+os.system("source /tmp/arch-mojo/venv/bin/activate")
+os.system("pip install inquirer")
+
 import inquirer
 import urllib.request
 
