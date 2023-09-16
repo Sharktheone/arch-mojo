@@ -7,22 +7,33 @@ os.system("pip install inquirer")
 import inquirer
 import urllib.request
 
+# TODO use shutil to copy files
+
 arch = "x86_64-linux-gnu"
 
 questions = [
     inquirer.Confirm("modular", message="Do you already have modular installed?"),
     inquirer.Confirm("persistent", message="Do you want to install the libraries persistent?"),
     inquirer.Confirm("venv", message="Do you want to automatically use a venv when running modular install/update?"),
-    inquirer.Path("path", message="Where do you want to create the venv and temporary files (the venv is needed for "
-                                  "installation anyways)", path_type=inquirer.Path.DIRECTORY),
+    inquirer.Path("path", message="Where do you want to create the venv and temporary files. (the venv is needed for "
+                                  "installation anyways) Press enter to use a tmp dir", path_type=inquirer.Path.DIRECTORY),
     inquirer.Password("token", message="Please enter your Modular auth token. You can also type 'manual' to run "
                                        "modular manually when requested"),
 ]
 
+
 answers = inquirer.prompt(questions)
 
+if answers["venv"]:
+    if answers["path"].split("/")[1] == "tmp":
+        print("You can't use a tmp dir when you want to automatically use a venv. Please choose a different path")
+        exit(1)
+
 WORKING_DIR = answers["path"]
-if WORKING_DIR[-1] != "/":
+
+if WORKING_DIR == "":
+    WORKING_DIR = "/tmp/arch-mojo/"
+elif WORKING_DIR[-1] != "/":
     WORKING_DIR += "/"
 
 # install modular if not installed
@@ -68,3 +79,53 @@ else:
 os.system(f"python3 -m venv {WORKING_DIR}venv")
 os.system(f"source {WORKING_DIR}venv/bin/activate")
 os.system("modular install mojo")
+
+if answers["venv"]:
+    urllib.request.urlretrieve("https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/shell.sh",
+                               f"{WORKING_DIR}shell.sh")
+    shell_file = open(f"{WORKING_DIR}shell.sh", "a")
+    shell = shell_file.read()
+
+    shell.replace("{{venv-path}}", f"{WORKING_DIR}/venv")
+
+    rc_path = ""
+
+    match os.environ["SHELL"].split("/")[-1]:
+        case "bash":
+            rc_path.join("~/.bashrc")
+        case "zsh":
+            rc_path.join("~/.zshrc")
+        case _:
+            shell_questions = [
+                inquirer.Text("rc-path",
+                              message="Please enter the path to your shell rc file (e.g. ~/.bashrc for bash)"),
+            ]
+            shell_answers = inquirer.prompt(shell_questions)
+            rc_path.join(shell_answers["rc-path"])
+
+    rc_file = open(rc_path, "a")
+    rc_file.write(shell)
+
+# delete temp files
+# maybe here a check would make sense if the WORKING_DIR is already existing
+
+if WORKING_DIR.split("/")[1] == "tmp":
+    exit(0)
+
+created_files = [
+    "PKGBUILD",
+    "libncurses.deb",
+    "data.tar.xz",
+    "control.tar.xz",
+    "shell.sh",
+    "venv",
+    f"lib/{arch}/*",
+    f"usr/lib/{arch}/*",
+    "usr/share/doc/*",
+]
+
+if answers["venv"]:
+    created_files.append("venv")
+
+for file in created_files:
+    os.system(f"rm {WORKING_DIR}{file}")
