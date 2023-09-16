@@ -16,7 +16,8 @@ questions = [
     inquirer.Confirm("persistent", message="Do you want to install the libraries persistent?"),
     inquirer.Confirm("venv", message="Do you want to automatically use a venv when running modular install/update?"),
     inquirer.Path("path", message="Where do you want to create the venv and temporary files. (the venv is needed for "
-                                  "installation anyways) Press enter to use a tmp dir", path_type=inquirer.Path.DIRECTORY),
+                                  "installation anyways) Press enter to use a tmp dir (not when using the venv)",
+                  path_type=inquirer.Path.DIRECTORY),
     inquirer.Password("token", message="Please enter your Modular auth token. You can also type 'manual' to run "
                                        "modular manually when requested"),
 ]
@@ -81,12 +82,13 @@ os.system(f"source {WORKING_DIR}venv/bin/activate")
 os.system("modular install mojo")
 
 if answers["venv"]:
+    os.system(f"python3 -m venv {WORKING_DIR}venv")
     urllib.request.urlretrieve("https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/shell.sh",
                                f"{WORKING_DIR}shell.sh")
     shell_file = open(f"{WORKING_DIR}shell.sh", "a")
     shell = shell_file.read()
 
-    shell.replace("{{venv-path}}", f"{WORKING_DIR}/venv")
+    shell.replace("{{venv-path}}", f"{WORKING_DIR}venv")
 
     rc_path = ""
 
