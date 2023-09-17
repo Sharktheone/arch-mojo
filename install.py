@@ -1,28 +1,21 @@
 import os
-
-os.system("python3 -m venv /tmp/arch-mojo/venv")
-os.system("source /tmp/arch-mojo/venv/bin/activate")
-os.system("pip install inquirer")
-
-import inquirer
 import urllib.request
 
 # TODO use shutil to copy files
 
 arch = "x86_64-linux-gnu"
 
-questions = [
-    inquirer.Confirm("modular", message="Do you already have modular installed?"),
-    inquirer.Confirm("persistent", message="Do you want to install the libraries globally (for all users)?"),
-    inquirer.Confirm("venv", message="Do you want to automatically use a venv when running modular install/update?"),
-    inquirer.Path("path", message="Where do you want to create the venv and temporary files. (the venv is needed for "
-                                  "installation anyways) Press enter to use a tmp dir (not when using the venv)",
-                  path_type=inquirer.Path.DIRECTORY),
-    inquirer.Password("token", message="Please enter your Modular auth token. You can also type 'manual' to run "
-                                       "modular manually when requested"),
-]
+answers = {}
 
-answers = inquirer.prompt(questions)
+answers["modular"] = input("Do you already have modular installed? (y/n) ").lower() == "y"
+answers["global"] = input("Do you want to install the libraries globally (for all users)? (y/n) ").lower() == "y"
+answers["venv"] = input(
+    "Do you want to automatically use a venv when running modular install/update? (y/n) ").lower() == "y"
+if answers["venv"]:
+    answers["path"] = input("Where do you want to create the venv and temporary files. (the venv is needed for "
+                            "installation anyways) ")
+answers["token"] = input("Please enter your Modular auth token. You can also type 'manual' to run "
+                         "modular manually when requested ")
 
 if answers["venv"]:
     if answers["path"].split("/")[1] == "tmp":
@@ -87,12 +80,8 @@ match os.environ["SHELL"].split("/")[-1]:
     case "zsh":
         rc_path.join("~/.zshrc")
     case _:
-        shell_questions = [
-            inquirer.Text("rc-path",
-                          message="Please enter the path to your shell rc file (e.g. ~/.bashrc for bash)"),
-        ]
-        shell_answers = inquirer.prompt(shell_questions)
-        rc_path.join(shell_answers["rc-path"])
+        path = input("Please enter the path to your shell rc file (e.g. ~/.bashrc for bash) ")
+        rc_path.join(path)
 
 rc_file = open(rc_path, "a")
 
