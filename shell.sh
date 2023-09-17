@@ -1,3 +1,5 @@
+# added by arch-mojo script
+
 function modular() {
     if [[ "$1" == "install" ]] ||  [[ "$1" == "uninstall" ]]; then
         source {{venv-path}}/bin/activate

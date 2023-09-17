@@ -7,20 +7,20 @@ arch = "x86_64-linux-gnu"
 
 answers = {}
 
-answers["modular"] = input("Do you already have modular installed? (y/n) ").lower() == "y"
-answers["global"] = input("Do you want to install the libraries globally (for all users)? (y/n) ").lower() == "y"
+answers["modular"] = input("Do you already have modular installed? (y/n): ").lower() == "y"
+answers["global"] = input("Do you want to install the libraries globally (for all users)? (y/n): ").lower() == "y"
 answers["venv"] = input(
-    "Do you want to automatically use a venv when running modular install/update? (y/n) ").lower() == "y"
+    "Do you want to automatically use a venv when running modular install/update? (y/n): ").lower() == "y"
 if answers["venv"]:
-    answers["path"] = input("Where do you want to create the venv and temporary files. (the venv is needed for "
-                            "installation anyways) ")
-answers["token"] = input("Please enter your Modular auth token. You can also type 'manual' to run "
-                         "modular manually when requested ")
-
-if answers["venv"]:
+    answers["path"] = input("Where do you want to create the venv?: ")
     if answers["path"].split("/")[1] == "tmp":
         print("You can't use a tmp dir when you want to automatically use a venv. Please choose a different path")
         exit(1)
+
+else:
+    answers["path"] = "/tmp/arch-mojo/"
+answers["token"] = input("Please enter your Modular auth token. You can also type 'manual' to run "
+                         "modular manually when requested: ")
 
 WORKING_DIR = answers["path"]
 
@@ -40,7 +40,7 @@ if answers["modular"]:
 if answers["token"] != "manual":
     os.system(f"modular auth {answers['token']}")
 else:
-    print("Please run 'modular auth <token>' to authenticate yourself")
+    print("Please run 'modular auth <token>' to authenticate yourself, if you haven't already.")
     input("Press enter to continue")
 
 # download ncurses lib
@@ -98,6 +98,8 @@ if answers["venv"]:
 
 exports = \
     """
+    
+# added by arch-mojo script
 export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo
 """
