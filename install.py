@@ -57,7 +57,11 @@ else:
 urllib.request.urlretrieve("http://ftp.debian.org/debian/pool/main/n/ncurses/libncurses6_6.4-4_amd64.deb",
                            f"{WORKING_DIR}libncurses.deb")
 
+urllib.request.urlretrieve("http://ftp.debian.org/debian/pool/main/libe/libedit/libedit2_3.1-20221030-2_amd64.deb",
+                           f"{WORKING_DIR}libedit.deb")
+
 os.system(f"cd {WORKING_DIR} && ar -vx libncurses.deb && tar -xf data.tar.xz")
+os.system(f"cd {WORKING_DIR} && ar -vx libedit.deb && tar -xf data.tar.xz")
 
 # copy libs
 if answers["global"]:
@@ -73,7 +77,8 @@ else:
 
     os.system(f"cp {WORKING_DIR}lib/{arch}/libncurses.so.6.4 {mojo_lib_path}/libncurses.so.6")
     os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libform.so.6.4 {mojo_lib_path}/libform.so.6")
-    os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libpanel.so.6.4 {mojo_lib_path}/libncurses.so.6.4")
+    os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libpanel.so.6.4 {mojo_lib_path}/libncurses.so.6")
+    os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libedit.so.2.0.70 {mojo_lib_path}/libedit.so.2")
 
 # install mojo
 
