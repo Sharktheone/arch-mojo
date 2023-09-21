@@ -77,7 +77,7 @@ else:
 
     os.system(f"cp {WORKING_DIR}lib/{arch}/libncurses.so.6.4 {mojo_lib_path}/libncurses.so.6")
     os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libform.so.6.4 {mojo_lib_path}/libform.so.6")
-    os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libpanel.so.6.4 {mojo_lib_path}/libncurses.so.6")
+    os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libpanel.so.6.4 {mojo_lib_path}/libpanel.so.6")
     os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libedit.so.2.0.70 {mojo_lib_path}/libedit.so.2")
 
 # install mojo
@@ -133,9 +133,6 @@ if (("~/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["PATH"]
     rc_file.write(exports)
 
 rc_file.close()
-
-print("\033[91mCurrently with mojo v0.3.0 there is another error with NCURSES i am currently investigating. In the "
-      "meantime you can star the repository! ❤️ \033[00m")
 
 # # delete temp files
 # # maybe here a check would make sense if the WORKING_DIR is already existing
