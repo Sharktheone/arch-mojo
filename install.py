@@ -134,6 +134,9 @@ if (("~/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["PATH"]
 
 rc_file.close()
 
+print("\033[91mCurrently with mojo v0.3.0 there is another error with NCURSES i am currently investigating. In the "
+      "meantime you can star the repository! ❤️ \033[00m")
+
 # # delete temp files
 # # maybe here a check would make sense if the WORKING_DIR is already existing
 #
