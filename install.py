@@ -99,15 +99,18 @@ def rc_path():
 
 
 rc_file = open(rc_path(), "a")
+shell_rc = open(rc_path(), "r").read()
 
-if answers["venv"]:
+if (answers["venv"]
+        and "function modular()" not in shell_rc
+        and "function mojo()" not in shell_rc):
     os.system(f"python3 -m venv {WORKING_DIR}venv")
     urllib.request.urlretrieve("https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/shell.sh",
                                f"{WORKING_DIR}shell.sh")
     shell_file = open(f"{WORKING_DIR}shell.sh", "r")
     shell = shell_file.read()
 
-    shell.replace("{{venv-path}}", f"{WORKING_DIR}venv")
+    shell = shell.replace("{{venv-path}}", f"{WORKING_DIR}venv")
 
     rc_file.write(shell)
 
@@ -119,7 +122,15 @@ export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo
 """
 
-rc_file.write(exports)
+home = os.environ["HOME"]
+
+# check if exports are already in rc file
+if (("~/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["PATH"]
+     or f"{home}/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["LD_LIBRARY_PATH"])
+        and
+        ("~/.local/lib/mojo" not in os.environ["LD_LIBRARY_PATH"]
+         or f"{home}/.local/lib/mojo" not in os.environ["LD_LIBRARY_PATH"])):
+    rc_file.write(exports)
 
 rc_file.close()
 
