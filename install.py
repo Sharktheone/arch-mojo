@@ -36,7 +36,6 @@ try:
 except FileExistsError:
     pass
 
-
 # install modular if not installed
 if not answers["modular"]:
     # download PKGBUILD
@@ -124,11 +123,14 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo
 home = os.environ["HOME"]
 
 # check if exports are already in rc file
-if (("~/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["PATH"]
-     or f"{home}/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["LD_LIBRARY_PATH"])
-        and
-        ("~/.local/lib/mojo" not in os.environ["LD_LIBRARY_PATH"]
-         or f"{home}/.local/lib/mojo" not in os.environ["LD_LIBRARY_PATH"])):
+try:
+    if (("~/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["PATH"]
+         or f"{home}/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["LD_LIBRARY_PATH"])
+            and
+            ("~/.local/lib/mojo" not in os.environ["LD_LIBRARY_PATH"]
+             or f"{home}/.local/lib/mojo" not in os.environ["LD_LIBRARY_PATH"])):
+        rc_file.write(exports)
+except:
     rc_file.write(exports)
 
 rc_file.close()
