@@ -83,8 +83,7 @@ else:
 # install mojo
 
 os.system(f"python3 -m venv {WORKING_DIR}venv")
-os.system(f"source {WORKING_DIR}venv/bin/activate")
-os.system("modular install mojo")
+os.system(f"source {WORKING_DIR}venv/bin/activate && modular install mojo")
 
 
 def rc_path():

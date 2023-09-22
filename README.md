@@ -4,5 +4,5 @@ Since mojo needs a version of ncurses that is not available on normal way on Arc
 ## Installation
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py -o /tmp/arch-mojo/install.py && python /tmp/arch-mojo/install.py
+mkdir -p /tmp/arch-mojo && curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py -o /tmp/arch-mojo/install.py && python /tmp/arch-mojo/install.py
 ```
