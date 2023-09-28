@@ -1,5 +1,5 @@
 pkgname=modular
-pkgver=0.1.4
+pkgver=0.2.0
 pkgrel=1
 pkgdesc="Modular installation tool"
 url="https://developer.modular.com/download"
