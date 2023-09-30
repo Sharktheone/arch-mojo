@@ -7,20 +7,6 @@ import urllib.request
 
 arch = "x86_64-linux-gnu"
 
-answers = {}
-
-
-answers["venv"] = input(
-    "Do you want to automatically use a venv when running modular install/update? (y/n): ").lower() == "y"
-
-
-modular = shutil.which("modular") is not None
-venv = os.environ["MOJO_VENV"] is not None
-authenticated = subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8") == "true"
-
-token = input("Please enter your Modular auth token. You can also type 'manual' to run "
-              "modular manually when requested: ")
-
 
 def param(name: str):
     try:
@@ -29,17 +15,32 @@ def param(name: str):
         return None
 
 
+modular = shutil.which("modular") is not None
+venv = param("MOJO_VENV") is not None
+authenticated = subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8") == "true"
+
+token = input("Please enter your Modular auth token. You can also type 'manual' to run "
+              "modular manually when requested: ")
+
 install_global = param("ARCH_MOJO_GLOBAL") is not None
 
 WORKING_DIR = param("ARCH_MOJO_WORKING_DIR") if param("ARCH_MOJO_WORKING_DIR") is not None else "~/.local/arch-mojo/"
+VENV_PATH = param("ARCH_MOJO_VENV_PATH") if param("ARCH_MOJO_VENV_PATH") is not None else "~/.local/arch-mojo/venv/"
 
-WORKING_DIR = WORKING_DIR.replace("~", os.environ["HOME"])
+WORKING_DIR = WORKING_DIR.replace("~", param("HOME"))
 
 if WORKING_DIR[-1] != "/":
     WORKING_DIR += "/"
+if VENV_PATH[-1] != "/":
+    VENV_PATH += "/"
 
 try:
     os.makedirs(WORKING_DIR)
+except FileExistsError:
+    pass
+
+try:
+    os.makedirs(VENV_PATH)
 except FileExistsError:
     pass
 
@@ -53,7 +54,6 @@ if not modular:
 # authenticate in modular
 
 os.system(f"modular auth {token}")
-
 
 # download ncurses lib
 
@@ -71,8 +71,6 @@ if install_global:
     os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /lib/")
     os.system(f"sudo cp {WORKING_DIR}usr/lib/{arch}/* /usr/lib/")
     os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /usr/lib/")
-
-
 else:
     mojo_lib_path = "/home/$USER/.local/lib/mojo"
 
@@ -90,14 +88,14 @@ os.system(f"source {WORKING_DIR}venv/bin/activate && modular install mojo")
 
 
 def rc_path():
-    match os.environ["SHELL"].split("/")[-1]:
+    match param("SHELL").split("/")[-1]:
         case "bash":
-            return f"{os.environ['HOME']}/.bashrc"
+            return f"{param('HOME')}/.bashrc"
         case "zsh":
-            return f"{os.environ['HOME']}/.zshrc"
+            return f"{param('HOME')}/.zshrc"
         case _:
             path = input("Please enter the path to your shell rc file (e.g. ~/.bashrc for bash): ")
-            return path.replace("~", os.environ["HOME"])
+            return path.replace("~", param("HOME"))
 
 
 rc_file = open(rc_path(), "a")
@@ -124,15 +122,15 @@ export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo
 """
 
-home = os.environ["HOME"]
+home = param("HOME")
 
 # check if exports are already in rc file
 try:
-    if (("~/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["PATH"]
-         or f"{home}/.modular/pkg/packages.modular.com_mojo/bin/" not in os.environ["LD_LIBRARY_PATH"])
+    if (("~/.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH")
+         or f"{home}/.modular/pkg/packages.modular.com_mojo/bin/" not in param("LD_LIBRARY_PATH"))
             and
-            ("~/.local/lib/mojo" not in os.environ["LD_LIBRARY_PATH"]
-             or f"{home}/.local/lib/mojo" not in os.environ["LD_LIBRARY_PATH"])):
+            ("~/.local/lib/mojo" not in param("LD_LIBRARY_PATH")
+             or f"{home}/.local/lib/mojo" not in param("LD_LIBRARY_PATH"))):
         rc_file.write(exports)
 except:
     rc_file.write(exports)
