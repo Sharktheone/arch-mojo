@@ -1,4 +1,6 @@
 import os
+import shutil
+import subprocess
 import urllib.request
 
 # TODO use shutil to copy files
@@ -7,28 +9,33 @@ arch = "x86_64-linux-gnu"
 
 answers = {}
 
-answers["modular"] = input("Do you have modular already installed? (y/n): ").lower() == "y"
-answers["global"] = input("Do you want to install the libraries globally (for all users)? (y/n): ").lower() == "y"
+
 answers["venv"] = input(
     "Do you want to automatically use a venv when running modular install/update? (y/n): ").lower() == "y"
-if answers["venv"]:
-    answers["path"] = input("Where do you want to create the venv?: ")
-    if answers["path"].split("/")[1] == "tmp":
-        print("You can't use a tmp dir when you want to automatically use a venv. Please choose a different path")
-        exit(1)
 
-else:
-    answers["path"] = "/tmp/arch-mojo/"
-answers["token"] = input("Please enter your Modular auth token. You can also type 'manual' to run "
-                         "modular manually when requested: ")
 
-WORKING_DIR = answers["path"]
+modular = shutil.which("modular") is not None
+venv = os.environ["MOJO_VENV"] is not None
+authenticated = subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8") == "true"
+
+token = input("Please enter your Modular auth token. You can also type 'manual' to run "
+              "modular manually when requested: ")
+
+
+def param(name: str):
+    try:
+        return os.environ[name]
+    except:
+        return None
+
+
+install_global = param("ARCH_MOJO_GLOBAL") is not None
+
+WORKING_DIR = param("ARCH_MOJO_WORKING_DIR") if param("ARCH_MOJO_WORKING_DIR") is not None else "~/.local/arch-mojo/"
 
 WORKING_DIR = WORKING_DIR.replace("~", os.environ["HOME"])
 
-if WORKING_DIR == "":
-    WORKING_DIR = "/tmp/arch-mojo/"
-elif WORKING_DIR[-1] != "/":
+if WORKING_DIR[-1] != "/":
     WORKING_DIR += "/"
 
 try:
@@ -37,19 +44,16 @@ except FileExistsError:
     pass
 
 # install modular if not installed
-if not answers["modular"]:
+if not modular:
     # download PKGBUILD
     urllib.request.urlretrieve("https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/PKGBUILD",
                                f"{WORKING_DIR}PKGBUILD")
     os.system(f"cd {WORKING_DIR} && makepkg -si")
 
 # authenticate in modular
-if answers["token"] != "manual":
-    os.system(f"modular auth {answers['token']}")
-else:
-    print("\n\nPlease run 'modular auth <token>' to authenticate yourself, if you haven't already.")
-    input("Press enter to continue")
-    print("\n")
+
+os.system(f"modular auth {token}")
+
 
 # download ncurses lib
 
@@ -63,7 +67,7 @@ os.system(f"cd {WORKING_DIR} && ar -vx libncurses.deb && tar -xf data.tar.xz")
 os.system(f"cd {WORKING_DIR} && ar -vx libedit.deb && tar -xf data.tar.xz")
 
 # copy libs
-if answers["global"]:
+if install_global:
     os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /lib/")
     os.system(f"sudo cp {WORKING_DIR}usr/lib/{arch}/* /usr/lib/")
     os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /usr/lib/")
@@ -99,7 +103,7 @@ def rc_path():
 rc_file = open(rc_path(), "a")
 shell_rc = open(rc_path(), "r").read()
 
-if (answers["venv"]
+if (venv
         and "function modular()" not in shell_rc
         and "function mojo()" not in shell_rc):
     os.system(f"python3 -m venv {WORKING_DIR}venv")
