@@ -16,11 +16,13 @@ def param(name: str):
 
 
 modular = shutil.which("modular") is not None
-venv = param("MOJO_VENV") is not None
-authenticated = subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8") == "true"
 
-token = input("Please enter your Modular auth token. You can also type 'manual' to run "
-              "modular manually when requested: ")
+venv = param("MOJO_VENV") is not None
+authenticated = False
+if modular:
+    authenticated = "user.id" in subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8")
+
+
 
 install_global = param("ARCH_MOJO_GLOBAL") is not None
 
@@ -52,8 +54,9 @@ if not modular:
     os.system(f"cd {WORKING_DIR} && makepkg -si")
 
 # authenticate in modular
-
-os.system(f"modular auth {token}")
+if not authenticated:
+    token = input("Please enter your Modular auth token: ")
+    os.system(f"modular auth {token}")
 
 # download ncurses lib
 
