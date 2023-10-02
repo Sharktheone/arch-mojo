@@ -22,8 +22,6 @@ authenticated = False
 if modular:
     authenticated = "user.id" in subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8")
 
-
-
 install_global = param("ARCH_MOJO_GLOBAL") is not None
 
 WORKING_DIR = param("ARCH_MOJO_WORKING_DIR") if param("ARCH_MOJO_WORKING_DIR") is not None else "~/.local/arch-mojo/"
@@ -60,10 +58,10 @@ if not authenticated:
 
 # download ncurses lib
 
-urllib.request.urlretrieve("http://ftp.debian.org/debian/pool/main/n/ncurses/libncurses6_6.4-4_amd64.deb",
+urllib.request.urlretrieve("https://ftp.debian.org/debian/pool/main/n/ncurses/libncurses6_6.4-4_amd64.deb",
                            f"{WORKING_DIR}libncurses.deb")
 
-urllib.request.urlretrieve("http://ftp.debian.org/debian/pool/main/libe/libedit/libedit2_3.1-20221030-2_amd64.deb",
+urllib.request.urlretrieve("https://ftp.debian.org/debian/pool/main/libe/libedit/libedit2_3.1-20221030-2_amd64.deb",
                            f"{WORKING_DIR}libedit.deb")
 
 os.system(f"cd {WORKING_DIR} && ar -vx libncurses.deb && tar -xf data.tar.xz")
