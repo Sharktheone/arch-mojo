@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+import sys
 import urllib.request
 
 # TODO use shutil to copy files
@@ -15,20 +16,36 @@ def param(name: str):
         return None
 
 
+WORKING_DIR = "~/.local/arch-mojo/"
+install_global = False
+
+for arg in sys.argv:
+    if arg.startswith("--dir="):
+        WORKING_DIR = arg.split("=")[1]
+    elif arg.startswith("-d="):
+        WORKING_DIR = arg.split("=")[1]
+    elif arg == "--global":
+        install_global = True
+    elif arg == "-g":
+        install_global = True
+    elif arg == "--help" \
+            or arg == "-h":
+        print("Usage: python3 install.py [options]")
+        print("Options:")
+        print("  --dir=<path>  | -d=<path>  : Set the working directory")
+        print("  --global      | -g         : Install the libs globally")
+        print("  --help        | -h         : Show this help message")
+        exit(0)
+
+WORKING_DIR = WORKING_DIR.replace("~", param("HOME"))
+if WORKING_DIR[-1] != "/":
+    WORKING_DIR += "/"
+
 modular = shutil.which("modular") is not None
 
 authenticated = False
 if modular:
     authenticated = "user.id" in subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8")
-
-install_global = param("ARCH_MOJO_GLOBAL") is not None
-
-WORKING_DIR = param("ARCH_MOJO_WORKING_DIR") if param("ARCH_MOJO_WORKING_DIR") is not None else "~/.local/arch-mojo/"
-
-WORKING_DIR = WORKING_DIR.replace("~", param("HOME"))
-
-if WORKING_DIR[-1] != "/":
-    WORKING_DIR += "/"
 
 try:
     os.makedirs(WORKING_DIR)
@@ -96,11 +113,13 @@ shell_rc = open(rc_pth, "r").read()
 home = param("HOME")
 
 # check if exports are already in rc file
-if "~/.local/lib/mojo" not in param("LD_LIBRARY_PATH") \
+if param("LD_LIBRARY_PATH") is None or \
+        "~/.local/lib/mojo" not in param("LD_LIBRARY_PATH") \
         or f"{home}.local/lib/mojo" not in param("LD_LIBRARY_PATH"):
     rc_file.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo\n")
 
-if "~/.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH") \
+if param("PATH") is None \
+        or "~/.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH") \
         or f"{home}.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH"):
     rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 rc_file.close()
