@@ -17,7 +17,6 @@ def param(name: str):
 
 modular = shutil.which("modular") is not None
 
-venv = param("MOJO_VENV") is not None
 authenticated = False
 if modular:
     authenticated = "user.id" in subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8")
@@ -25,22 +24,14 @@ if modular:
 install_global = param("ARCH_MOJO_GLOBAL") is not None
 
 WORKING_DIR = param("ARCH_MOJO_WORKING_DIR") if param("ARCH_MOJO_WORKING_DIR") is not None else "~/.local/arch-mojo/"
-VENV_PATH = param("ARCH_MOJO_VENV_PATH") if param("ARCH_MOJO_VENV_PATH") is not None else "~/.local/arch-mojo/venv/"
 
 WORKING_DIR = WORKING_DIR.replace("~", param("HOME"))
 
 if WORKING_DIR[-1] != "/":
     WORKING_DIR += "/"
-if VENV_PATH[-1] != "/":
-    VENV_PATH += "/"
 
 try:
     os.makedirs(WORKING_DIR)
-except FileExistsError:
-    pass
-
-try:
-    os.makedirs(VENV_PATH)
 except FileExistsError:
     pass
 
@@ -83,9 +74,7 @@ else:
     os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libedit.so.2.0.70 {mojo_lib_path}/libedit.so.2")
 
 # install mojo
-
-os.system(f"python3 -m venv {WORKING_DIR}venv")
-os.system(f"source {WORKING_DIR}venv/bin/activate && modular install mojo")
+os.system("modular install mojo")
 
 
 def rc_path():
@@ -99,76 +88,21 @@ def rc_path():
             return path.replace("~", param("HOME"))
 
 
-rc_file = open(rc_path(), "a")
-shell_rc = open(rc_path(), "r").read()
+rc_pth = rc_path()
 
-if (venv
-        and "function modular()" not in shell_rc
-        and "function mojo()" not in shell_rc):
-    os.system(f"python3 -m venv {WORKING_DIR}venv")
-    urllib.request.urlretrieve("https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/shell.sh",
-                               f"{WORKING_DIR}shell.sh")
-    shell_file = open(f"{WORKING_DIR}shell.sh", "r")
-    shell = shell_file.read()
-
-    shell = shell.replace("{{venv-path}}", f"{WORKING_DIR}venv")
-
-    rc_file.write(shell)
-
-exports = \
-    """
-    
-# added by arch-mojo script
-export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo
-"""
+rc_file = open(rc_pth, "a")
+shell_rc = open(rc_pth, "r").read()
 
 home = param("HOME")
 
 # check if exports are already in rc file
-try:
-    if (("~/.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH")
-         or f"{home}/.modular/pkg/packages.modular.com_mojo/bin/" not in param("LD_LIBRARY_PATH"))
-            and
-            ("~/.local/lib/mojo" not in param("LD_LIBRARY_PATH")
-             or f"{home}/.local/lib/mojo" not in param("LD_LIBRARY_PATH"))):
-        rc_file.write(exports)
-except:
-    rc_file.write(exports)
+if "~/.local/lib/mojo" not in param("LD_LIBRARY_PATH") \
+        or f"{home}.local/lib/mojo" not in param("LD_LIBRARY_PATH"):
+    rc_file.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo\n")
 
+if "~/.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH") \
+        or f"{home}.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH"):
+    rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 rc_file.close()
 
-# # delete temp files
-# # maybe here a check would make sense if the WORKING_DIR is already existing
-#
-# if WORKING_DIR.split("/")[1] == "tmp":
-#     exit(0)
-#
-#
-# #TODO list all created files and don't do this manually
-#
-# created_files = [
-#     "PKGBUILD",
-#     "libncurses.deb",
-#     "data.tar.xz",
-#     "control.tar.xz",
-#     "shell.sh",
-#     "venv",
-#     f"lib/{arch}/*",
-#     f"usr/lib/{arch}/*",
-#     "usr/share/doc/*",
-#     "modular-0.1.4-1-x86_64.pkg.tar.zst",
-#     "modular-0.1.4-amd64.deb",
-#     "debian-binary",
-#     "pkg/modular/etc/modular/*",
-#     "pkg/modular/usr/bin/*",
-#     "pkg/modular/usr/share/man/man1/*",
-#     "src/*"
-#
-# ]
-#
-# if not answers["venv"]:
-#     os.system(f"rm -r {WORKING_DIR}venv")
-#
-# for file in created_files:
-#     os.system(f"rm {WORKING_DIR}{file}")
+print(f"Please restart your shell or run `source {rc_pth} `to complete the installation")
