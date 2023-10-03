@@ -12,7 +12,7 @@ depends=(
 )
 arch=("x86_64")
 source=("https://dl.modular.com/public/installer/deb/debian/pool/any-version/main/m/mo/modular_$pkgver/modular-$pkgver-amd64.deb")
-sha256sums=("7b958ac02260ae9a7224c6ae50860a4dd00089ffc00fc87a0c56585b34c10849")
+sha256sums=("6b1eda633e554ab9c6db1f4a5508c193158fca45466f47b27016922357db62d7")
 
 package() {
     bsdtar -xf data.tar -C "$pkgdir/"
