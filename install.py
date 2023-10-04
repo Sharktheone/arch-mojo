@@ -18,6 +18,7 @@ def param(name: str):
 
 WORKING_DIR = "~/.local/arch-mojo/"
 install_global = False
+onlyMojo = False
 
 for arg in sys.argv:
     if arg.startswith("--dir="):
@@ -28,6 +29,10 @@ for arg in sys.argv:
         install_global = True
     elif arg == "-g":
         install_global = True
+    elif arg == "--mojo":
+        onlyMojo = True
+    elif arg == "-m":
+        onlyMojo = True
     elif arg == "--help" \
             or arg == "-h":
         print("Usage: python3 install.py [options]")
@@ -35,6 +40,7 @@ for arg in sys.argv:
         print("  --dir=<path>  | -d=<path>  : Set the working directory")
         print("  --global      | -g         : Install the libs globally")
         print("  --help        | -h         : Show this help message")
+        print("  --mojo        | -m         : Only install mojo (modular must be installed)")
         exit(0)
 
 WORKING_DIR = WORKING_DIR.replace("~", param("HOME"))
@@ -46,6 +52,13 @@ modular = shutil.which("modular") is not None
 authenticated = False
 if modular:
     authenticated = "user.id" in subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8")
+
+if onlyMojo and not modular:
+    print("Modular must be installed to install mojo")
+    exit(1)
+if onlyMojo and not authenticated:
+    print("You must be authenticated in modular to install mojo")
+    exit(1)
 
 try:
     os.makedirs(WORKING_DIR)
