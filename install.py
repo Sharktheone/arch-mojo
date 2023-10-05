@@ -137,4 +137,7 @@ if param("PATH") is None \
     rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 rc_file.close()
 
+# fix crashdb directory not found:
+os.makedirs(f"{home}/.modular/crashdb", exist_ok=True)
+
 print(f"Please restart your shell or run `source {rc_pth} `to complete the installation")

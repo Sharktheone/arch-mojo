@@ -11,10 +11,10 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 
 Install mojo globally:
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.sh) --global
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py) --global
 ```
 
 Change working directory:
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.sh) --dir=/tmp/arch-mojo
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py) --dir=/tmp/arch-mojo
 ```
