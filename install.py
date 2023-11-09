@@ -19,6 +19,7 @@ def param(name: str):
 WORKING_DIR = "~/.local/arch-mojo/"
 install_global = False
 onlyMojo = False
+fedora = False
 
 for arg in sys.argv:
     if arg.startswith("--dir="):
@@ -33,6 +34,10 @@ for arg in sys.argv:
         onlyMojo = True
     elif arg == "-m":
         onlyMojo = True
+    elif arg == "--fedora":
+        fedora = True
+    elif arg == "-f":
+        fedora = True
     elif arg == "--help" \
             or arg == "-h":
         print("Usage: python3 install.py [options]")
@@ -41,6 +46,7 @@ for arg in sys.argv:
         print("  --global      | -g         : Install the libs globally")
         print("  --help        | -h         : Show this help message")
         print("  --mojo        | -m         : Only install mojo (modular must be installed)")
+        print("  --fedora      | -f    : Install for fedora")
         exit(0)
 
 WORKING_DIR = WORKING_DIR.replace("~", param("HOME"))
@@ -61,6 +67,21 @@ try:
     os.makedirs(WORKING_DIR)
 except FileExistsError:
     pass
+
+if fedora:
+
+    os.system("sudo dnf install binutils")
+
+    urllib.request.urlretrieve("http://ftp.debian.org/debian/pool/main/n/ncurses/libtinfo6_6.4-4_amd64.deb",
+                               f"{WORKING_DIR}libtinfo.deb")
+    os.system(f"cd {WORKING_DIR} && ar -vx libtinfo.deb && tar -xf data.tar.xz")
+    if install_global:
+        os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /usr/lib/")
+    else:
+        mojo_lib_path = "/home/$USER/.local/lib/mojo"
+        os.system(f"mkdir -p {mojo_lib_path}")
+
+        os.system(f"cp {WORKING_DIR}lib/{arch}/libtinfo.so.6.4 {mojo_lib_path}/libtinfo.so.6")
 
 # install modular if not installed
 if not modular:
@@ -100,8 +121,9 @@ else:
     os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libpanel.so.6.4 {mojo_lib_path}/libpanel.so.6")
     os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libedit.so.2.0.70 {mojo_lib_path}/libedit.so.2")
 
+
 # install mojo
-os.system("modular install mojo")
+os.system("LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo modular install mojo")
 
 home = param("HOME")
 # fix crashdb directory not found:
@@ -114,7 +136,8 @@ def rc_path():
         case "zsh":
             return f"{param('HOME')}/.zshrc"
         case _:
-            path = input("Please enter the path to your shell rc file (e.g. ~/.bashrc for bash) or press ENTER to skip:")
+            path = input(
+                "Please enter the path to your shell rc file (e.g. ~/.bashrc for bash) or press ENTER to skip:")
             if path == "":
                 return None
             return path.replace("~", param("HOME"))
@@ -129,8 +152,6 @@ if rc_pth is None:
 rc_file = open(rc_pth, "a")
 shell_rc = open(rc_pth, "r").read()
 
-
-
 # check if exports are already in rc file
 if param("LD_LIBRARY_PATH") is None or \
         "~/.local/lib/mojo" not in param("LD_LIBRARY_PATH") \
@@ -142,6 +163,5 @@ if param("PATH") is None \
         or f"{home}.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH"):
     rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 rc_file.close()
-
 
 print(f"Please restart your shell or run `source {rc_pth} `to complete the installation")
