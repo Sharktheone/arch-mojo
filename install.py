@@ -56,9 +56,6 @@ if modular:
 if onlyMojo and not modular:
     print("Modular must be installed to install mojo")
     exit(1)
-if onlyMojo and not authenticated:
-    print("You must be authenticated in modular to install mojo")
-    exit(1)
 
 try:
     os.makedirs(WORKING_DIR)
@@ -106,6 +103,9 @@ else:
 # install mojo
 os.system("modular install mojo")
 
+home = param("HOME")
+# fix crashdb directory not found:
+os.makedirs(f"{home}/.modular/crashdb", exist_ok=True)
 
 def rc_path():
     match param("SHELL").split("/")[-1]:
@@ -114,16 +114,22 @@ def rc_path():
         case "zsh":
             return f"{param('HOME')}/.zshrc"
         case _:
-            path = input("Please enter the path to your shell rc file (e.g. ~/.bashrc for bash): ")
+            path = input("Please enter the path to your shell rc file (e.g. ~/.bashrc for bash) or press ENTER to skip:")
+            if path == "":
+                return None
             return path.replace("~", param("HOME"))
 
 
 rc_pth = rc_path()
 
+if rc_pth is None:
+    print("Skipping rc file installation")
+    exit(0)
+
 rc_file = open(rc_pth, "a")
 shell_rc = open(rc_pth, "r").read()
 
-home = param("HOME")
+
 
 # check if exports are already in rc file
 if param("LD_LIBRARY_PATH") is None or \
@@ -137,7 +143,5 @@ if param("PATH") is None \
     rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 rc_file.close()
 
-# fix crashdb directory not found:
-os.makedirs(f"{home}/.modular/crashdb", exist_ok=True)
 
 print(f"Please restart your shell or run `source {rc_pth} `to complete the installation")
