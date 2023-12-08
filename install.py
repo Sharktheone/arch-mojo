@@ -57,7 +57,7 @@ WORKING_DIR = WORKING_DIR.replace("~", param("HOME"))
 if WORKING_DIR[-1] != "/":
     WORKING_DIR += "/"
 mojo_lib_path_from_home = ".local/lib/mojo"
-mojo_lib_path = f"{home}{mojo_lib_path_from_home}"
+mojo_lib_path = f"{home}/{mojo_lib_path_from_home}"
 
 modular = shutil.which("modular") is not None
 
@@ -84,7 +84,6 @@ if fedora:
     if install_global:
         os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /usr/lib/")
     else:
-        mojo_lib_path = "/home/$USER/.local/lib/mojo"
         os.system(f"mkdir -p {mojo_lib_path}")
 
         os.system(f"cp {WORKING_DIR}lib/{arch}/libtinfo.so.6.4 {mojo_lib_path}/libtinfo.so.6")
@@ -167,4 +166,4 @@ if param("PATH") is None \
     rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 rc_file.close()
 
-print(f"Please restart your shell or run `source {rc_pth} `to complete the installation")
+print(f"Please restart your shell or run `source {rc_pth}` to complete the installation")
