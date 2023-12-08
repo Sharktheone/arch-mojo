@@ -16,6 +16,10 @@ def param(name: str):
         return None
 
 
+home = param("HOME")
+if home is None:
+    home = "~"
+
 WORKING_DIR = "~/.local/arch-mojo/"
 install_global = False
 onlyMojo = False
@@ -52,6 +56,8 @@ for arg in sys.argv:
 WORKING_DIR = WORKING_DIR.replace("~", param("HOME"))
 if WORKING_DIR[-1] != "/":
     WORKING_DIR += "/"
+mojo_lib_path_from_home = ".local/lib/mojo"
+mojo_lib_path = f"{home}{mojo_lib_path_from_home}"
 
 modular = shutil.which("modular") is not None
 
@@ -112,8 +118,6 @@ if install_global:
     os.system(f"sudo cp {WORKING_DIR}usr/lib/{arch}/* /usr/lib/")
     os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /usr/lib/")
 else:
-    mojo_lib_path = "/home/$USER/.local/lib/mojo"
-
     os.system(f"mkdir -p {mojo_lib_path}")
 
     os.system(f"cp {WORKING_DIR}lib/{arch}/libncurses.so.6.4 {mojo_lib_path}/libncurses.so.6")
@@ -121,13 +125,12 @@ else:
     os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libpanel.so.6.4 {mojo_lib_path}/libpanel.so.6")
     os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libedit.so.2.0.70 {mojo_lib_path}/libedit.so.2")
 
-
 # install mojo
-os.system("LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo modular install mojo")
+os.system(f"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{mojo_lib_path} modular install mojo")
 
-home = param("HOME")
 # fix crashdb directory not found:
 os.makedirs(f"{home}/.modular/crashdb", exist_ok=True)
+
 
 def rc_path():
     match param("SHELL").split("/")[-1]:
@@ -154,9 +157,9 @@ shell_rc = open(rc_pth, "r").read()
 
 # check if exports are already in rc file
 if param("LD_LIBRARY_PATH") is None or \
-        "~/.local/lib/mojo" not in param("LD_LIBRARY_PATH") \
-        or f"{home}.local/lib/mojo" not in param("LD_LIBRARY_PATH"):
-    rc_file.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo\n")
+        f"~/{mojo_lib_path_from_home}" not in param("LD_LIBRARY_PATH") \
+        or mojo_lib_path not in param("LD_LIBRARY_PATH"):
+    rc_file.write(f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/{mojo_lib_path_from_home}\n")
 
 if param("PATH") is None \
         or "~/.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH") \
