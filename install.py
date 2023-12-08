@@ -98,7 +98,7 @@ if not modular:
 # authenticate in modular
 if not authenticated:
     token = input("Please enter your Modular auth token: ")
-    os.system(f"modular auth {token}")
+    os.system(f"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{mojo_lib_path} modular auth {token}")
 
 # download ncurses lib
 
