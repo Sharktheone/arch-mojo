@@ -152,10 +152,10 @@ else:
     os.system(f"cp {WORKING_DIR}usr/lib/{arch}/libedit.so.2.0.70 {mojo_lib_path}/libedit.so.2")
 
 # install mojo
-mojo = shutil.which(f"PATH=$PATH:{home}.modular/pkg/packages.modular.com_mojo/bin/ mojo") is not None
+mojo = shutil.which(f"PATH=$PATH:{home}/.modular/pkg/packages.modular.com_mojo/bin/ mojo") is not None
 if mojo:
     print("Mojo is already installed... cleaning up")
-    os.system(f"PATH=$PATH:{home}.modular/pkg/packages.modular.com_mojo/bin/ modular clean")
+    os.system(f"PATH=$PATH:{home}/.modular/pkg/packages.modular.com_mojo/bin/ modular clean")
 
 os.system(f"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{mojo_lib_path} modular install mojo")
 
