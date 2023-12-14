@@ -31,8 +31,8 @@ token = None
 modular = shutil.which("modular") is not None
 
 authenticated = False
-# if modular:
-#     authenticated = "user.id" in subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8")
+if modular:
+    authenticated = "user.id" in subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8")
 
 for arg in sys.argv:
     if skip_next_arg:
@@ -94,11 +94,12 @@ except FileExistsError:
 if fedora:
     os.system("sudo dnf install binutils")
 
-    urllib.request.urlretrieve("http://ftp.debian.org/debian/pool/main/n/ncurses/libtinfo6_6.4-4_amd64.deb",
+    urllib.request.urlretrieve("https://ftp.debian.org/debian/pool/main/n/ncurses/libtinfo6_6.4-4_amd64.deb",
                                f"{WORKING_DIR}libtinfo.deb")
     os.system(f"cd {WORKING_DIR} && ar -vx libtinfo.deb && tar -xf data.tar.xz")
     if install_global:
-        os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /usr/lib/")
+        os.system(f"sudo cp {WORKING_DIR}lib/{arch}/libtinfo.so.6.4 /usr/lib/")
+        os.system("sudo ln -s /usr/lib/libtinfo.so.6.4 /usr/lib/libtinfo.so.6")
     else:
         os.system(f"mkdir -p {mojo_lib_path}")
 
@@ -130,18 +131,25 @@ urllib.request.urlretrieve("https://ftp.debian.org/debian/pool/main/libe/libedit
 os.system(f"cd {WORKING_DIR} && ar -vx libncurses.deb && tar -xf data.tar.xz")
 os.system(f"cd {WORKING_DIR} && ar -vx libedit.deb && tar -xf data.tar.xz")
 
+
 # copy libs
 if install_global:
-    os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /lib/")
-    os.system(f"sudo cp {WORKING_DIR}usr/lib/{arch}/* /usr/lib/")
-    os.system(f"sudo cp {WORKING_DIR}lib/{arch}/* /usr/lib/")
+    os.system(f"sudo cp {WORKING_DIR}lib/{arch}/libncurses.so.6.4 /lib/libncurses.so.6.4")
+    os.system(f"sudo cp {WORKING_DIR}usr/lib/{arch}/libform.so.6.4 /usr/lib/libform.so.6.4")
+    os.system(f"sudo cp {WORKING_DIR}usr/lib/{arch}/libpanel.so.6.4 /usr/lib/libpanel.so.6.4")
+    os.system(f"sudo cp {WORKING_DIR}usr/lib/{arch}/libedit.so.2.0.70 /usr/lib/libedit.so.2.0.70")
+
+    os.system("sudo ln -s /lib/libncurses.so.6.4 /lib/libncurses.so.6")
+    os.system("sudo ln -s /usr/lib/libform.so.6.4 /usr/lib/libform.so.6")
+    os.system("sudo ln -s /usr/lib/libpanel.so.6.4 /usr/lib/libpanel.so.6")
+    os.system("sudo ln -s /usr/lib/libedit.so.2.0.70 /usr/lib/libedit.so.2")
 else:
     os.system(f"mkdir -p {mojo_lib_path}")
 
     os.system(f"cp {WORKING_DIR}lib/{arch}/libncurses.so.6.4 {mojo_lib_path}/libncurses.so.6")
-    os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libform.so.6.4 {mojo_lib_path}/libform.so.6")
-    os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libpanel.so.6.4 {mojo_lib_path}/libpanel.so.6")
-    os.system(f"cp {WORKING_DIR}/usr/lib/{arch}/libedit.so.2.0.70 {mojo_lib_path}/libedit.so.2")
+    os.system(f"cp {WORKING_DIR}usr/lib/{arch}/libform.so.6.4 {mojo_lib_path}/libform.so.6")
+    os.system(f"cp {WORKING_DIR}usr/lib/{arch}/libpanel.so.6.4 {mojo_lib_path}/libpanel.so.6")
+    os.system(f"cp {WORKING_DIR}usr/lib/{arch}/libedit.so.2.0.70 {mojo_lib_path}/libedit.so.2")
 
 # install mojo
 mojo = shutil.which(f"PATH=$PATH:{home}.modular/pkg/packages.modular.com_mojo/bin/ mojo") is not None
