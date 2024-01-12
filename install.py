@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import sys
 import urllib.request
+from getpass import getpass
 
 # TODO use shutil to copy files
 
@@ -117,7 +118,7 @@ if not authenticated:
     if token is None:
         token = param("MODULAR_TOKEN")
     if token is None:
-        token = input("Please enter your Modular auth token: ")
+        token = getpass("Please enter your Modular auth token: ")
     os.system(f"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{mojo_lib_path} modular auth {token}")
 
 # download ncurses lib
