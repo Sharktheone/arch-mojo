@@ -131,7 +131,6 @@ urllib.request.urlretrieve("https://ftp.debian.org/debian/pool/main/libe/libedit
 os.system(f"cd {WORKING_DIR} && ar -vx libncurses.deb && tar -xf data.tar.xz")
 os.system(f"cd {WORKING_DIR} && ar -vx libedit.deb && tar -xf data.tar.xz")
 
-
 # copy libs
 if install_global:
     os.system(f"sudo cp {WORKING_DIR}lib/{arch}/libncurses.so.6.4 /lib/libncurses.so.6.4")
@@ -164,37 +163,83 @@ os.makedirs(f"{home}/.modular/crashdb", exist_ok=True)
 
 
 def rc_path():
-    match param("SHELL").split("/")[-1]:
-        case "bash":
-            return f"{param('HOME')}/.bashrc"
-        case "zsh":
-            return f"{param('HOME')}/.zshrc"
-        case _:
-            path = input(
-                "Please enter the path to your shell rc file (e.g. ~/.bashrc for bash) or press ENTER to skip:")
-            if path == "":
-                return None
-            return path.replace("~", param("HOME"))
+    shell = param("SHELL")
+    if shell is not None:
+        match shell.split("/")[-1]:
+            case "bash":
+                return get_shell("bash", f"{param('HOME')}/.bashrc")
+            case "zsh":
+                return get_shell("zsh", f"{param('HOME')}/.zshrc")
+            case _:
+                path = input(
+                    "Please enter the path to your shell rc file (e.g. ~/.bashrc for bash) or press ENTER to skip:")
+                if path == "":
+                    return None
+                return path.replace("~", param("HOME"))
+
+    else:
+        return get_shell()
+
+
+def get_shell(found=None, file=None):
+    if found is not None:
+        yn = input(f"Found {found} shell, add exports to {file}? [y/N/other]")
+        yn = yn.lower()
+        if yn == "y":
+            return file
+        elif yn == "n":
+            return None
+        elif yn == "other" or yn == "o":
+            return get_shell()
+        elif yn == "":
+            print("Skipping...")
+            return None
+        else:
+            print("Invalid input")
+            return get_shell(found, file)
+    else:
+        return get_shell_path()
+
+
+def get_shell_path():
+    path = input(
+        "Please enter the path to your shell rc file (e.g. ~/.bashrc for bash) or press ENTER to skip:")
+    if path == "":
+        return None
+    return path.replace("~", param("HOME"))
+
+
+def print_manual_instructions():
+    print("Please add the following to your shell rc file:")
+    print(f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/{mojo_lib_path_from_home}")
+    print("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/")
 
 
 rc_pth = rc_path()
 
 if rc_pth is None:
     print("Skipping rc file installation")
+    print_manual_instructions()
     exit(0)
 
 rc_file = open(rc_pth, "a")
-shell_rc = open(rc_pth, "r").read()
+
+if rc_file is None:
+    print(f"Could not open {rc_pth}, skipping...")
+    print_manual_instructions()
+    exit(0)
 
 # check if exports are already in rc file
-if param("LD_LIBRARY_PATH") is None or \
-        f"~/{mojo_lib_path_from_home}" not in param("LD_LIBRARY_PATH") \
-        or mojo_lib_path not in param("LD_LIBRARY_PATH"):
+if param("LD_LIBRARY_PATH") is None or (  # either if the lib path is not set or
+        not param("LD_LIBRARY_PATH").__contains__(f"~/{mojo_lib_path_from_home}") and  # the relative
+        not param("LD_LIBRARY_PATH").__contains__(mojo_lib_path)):  # and the absolute path are not in the lib path
+    print("wrote lib path")
     rc_file.write(f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/{mojo_lib_path_from_home}\n")
 
-if param("PATH") is None \
-        or "~/.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH") \
-        or f"{home}.modular/pkg/packages.modular.com_mojo/bin/" not in param("PATH"):
+if param("PATH") is None or (
+        not param("PATH").__contains__("~/.modular/pkg/packages.modular.com_mojo/bin/") and
+        not param("PATH").__contains__(f"{home}.modular/pkg/packages.modular.com_mojo/bin/")):
+    print("wrote path")
     rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 rc_file.close()
 
