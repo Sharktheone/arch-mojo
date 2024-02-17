@@ -135,11 +135,11 @@ class Mojo(object):
             subprocess.run(f"cd {self.working_dir} && ar -vx libtinfo.deb && tar -xf data.tar.xz", shell=True)
             
             if self.install_global:
-                subprocess.run(f"sudo cp {self.working_dir}lib/{self.arch}/libtinfo.so.6.4 /usr/lib/", shell=True)
-                subprocess.run("sudo ln -s /usr/lib/libtinfo.so.6.4 /usr/lib/libtinfo.so.6", shell=True)
+                shutil.copy(f"{self.working_dir}lib/{self.arch}/libtinfo.so.6.4", "/usr/lib/")
+                os.symlink("/usr/lib/libtinfo.so.6.4", "/usr/lib/libtinfo.so.6")
             else:
-                subprocess.run(f"mkdir -p {self.mojo_lib_path}", shell=True)
-                subprocess.run(f"cp {self.working_dir}lib/{self.arch}/libtinfo.so.6.4 {self.mojo_lib_path}/libtinfo.so.6", shell=True)
+                os.mkdir(f"{self.mojo_lib_path}")
+                shutil.copy(f"{self.working_dir}lib/{self.arch}/libtinfo.so.6.4", f"{self.mojo_lib_path}/libtinfo.so.6")
 
     def install_modular(self) -> None:
         url = "https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/PKGBUILD"
@@ -165,16 +165,15 @@ class Mojo(object):
         urllib.request.urlretrieve(url1, f"{self.working_dir}libncurses.deb")
         urllib.request.urlretrieve(url2,f"{self.working_dir}libedit.deb")
 
-        os.chdir(f"{self.working_dir}")
         subprocess.run(f"cd {self.working_dir} && ar -vx libncurses.deb && tar -xf data.tar.xz", shell=True)
         subprocess.run(f"cd {self.working_dir} && ar -vx libedit.deb && tar -xf data.tar.xz", shell=True)
 
         # copy libs
         if self.install_global:
             shutil.copy(f"{self.working_dir}lib/{self.arch}/libncurses.so.6.4", "/lib/libncurses.so.6.4")
-            shutil.copy(f"sudo cp {self.working_dir}usr/lib/{self.arch}/libform.so.6.4", "/usr/lib/libform.so.6.4")
-            shutil.copy(f"sudo cp {self.working_dir}usr/lib/{self.arch}/libpanel.so.6.4", "/usr/lib/libpanel.so.6.4")
-            shutil.copy(f"sudo cp {self.working_dir}usr/lib/{self.arch}/libedit.so.2.0.70", "/usr/lib/libedit.so.2.0.70")
+            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libform.so.6.4", "/usr/lib/libform.so.6.4")
+            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libpanel.so.6.4", "/usr/lib/libpanel.so.6.4")
+            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libedit.so.2.0.70", "/usr/lib/libedit.so.2.0.70")
 
             os.symlink("/lib/libncurses.so.6.4", "/lib/libncurses.so.6")
             os.symlink("/usr/lib/libform.so.6.4", "/usr/lib/libform.so.6")
@@ -182,7 +181,10 @@ class Mojo(object):
             os.symlink("/usr/lib/libedit.so.2.0.70", "/usr/lib/libedit.so.2")
         else:
             try:
-                os.mkdir(f"{self.mojo_lib_path}")
+                if not os.path.exists(f"{self.mojo_lib_path}"):
+                    os.mkdir(f"{self.mojo_lib_path}")
+                else:
+                    os.makedirs(f"{self.mojo_lib_path}")
             except FileExistsError:
                 pass
 
