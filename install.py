@@ -58,14 +58,14 @@ class Mojo(object):
                 return False
 
     def _help(self) -> int:
-        sys.stdout.write("Usage: python3 install.py [options]")
-        sys.stdout.write("Options:")
-        sys.stdout.write("  --dir=<path>  | -d=<path>  : Set the working directory")
-        sys.stdout.write("  --global      | -g         : Install the libs globally")
-        sys.stdout.write("  --help        | -h         : Show this help message")
-        sys.stdout.write("  --mojo        | -m         : Only install mojo (modular must be installed)")
-        sys.stdout.write("  --fedora      | -f         : Install for fedora")
-        sys.stdout.write("  --modular-token <token>    : Set the modular token")
+        sys.stdout.write("Usage: python3 install.py [options]\n")
+        sys.stdout.write("Options:\n")
+        sys.stdout.write("  --dir=<path>  | -d=<path>  : Set the working directory\n")
+        sys.stdout.write("  --global      | -g         : Install the libs globally\n")
+        sys.stdout.write("  --help        | -h         : Show this help message\n")
+        sys.stdout.write("  --mojo        | -m         : Only install mojo (modular must be installed)\n")
+        sys.stdout.write("  --fedora      | -f         : Install for fedora\n")
+        sys.stdout.write("  --modular-token <token>    : Set the modular token\n")
         return 0
 
     def is_authenticated(self) -> None:
