@@ -16,7 +16,7 @@ class Mojo(object):
         self.args = args
         self.arch = "x86_64-linux-gnu"
         self.home = home if home is not None else "~"
-        self.working_dir = "~/.local/arch-mojo/"
+        self.working_dir = "~/.local/arch-mojo"
         self.mojo_lib_path_from_home = ".local/lib/mojo"
         self.mojo_lib_path = f"{self.home}/{self.mojo_lib_path_from_home}"
         self.install_global = False
@@ -28,10 +28,10 @@ class Mojo(object):
         self.rc_file = None
         self.token = ""
         self.modular = shutil.which("modular") is not None
-        self.is_authenticated()
         self.handle_args()
         self.fedora_os()
         self.install_modular()
+        self.is_authenticated()
         self.ncurses()
         self.install_mojo()
         self.rc_path()
@@ -131,22 +131,24 @@ class Mojo(object):
         if self.fedora:
             subprocess.run("sudo dnf install binutils", shell=True)
 
-            urllib.request.urlretrieve(url, f"{self.working_dir}libtinfo.deb")
+            urllib.request.urlretrieve(url, f"{self.working_dir}/libtinfo.deb")
             subprocess.run(f"cd {self.working_dir} && ar -vx libtinfo.deb && tar -xf data.tar.xz", shell=True)
             
             if self.install_global:
-                shutil.copy(f"{self.working_dir}lib/{self.arch}/libtinfo.so.6.4", "/usr/lib/")
+                shutil.copy(f"{self.working_dir}/lib/{self.arch}/libtinfo.so.6.4", "/usr/lib/")
                 os.symlink("/usr/lib/libtinfo.so.6.4", "/usr/lib/libtinfo.so.6")
             else:
                 os.mkdir(f"{self.mojo_lib_path}")
-                shutil.copy(f"{self.working_dir}lib/{self.arch}/libtinfo.so.6.4", f"{self.mojo_lib_path}/libtinfo.so.6")
+                shutil.copy(f"{self.working_dir}/lib/{self.arch}/libtinfo.so.6.4", f"{self.mojo_lib_path}/libtinfo.so.6")
 
     def install_modular(self) -> None:
-        url = "https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/PKGBUILD"
+        url = "https://raw.githubusercontent.com/sneekyfoxx/arch-mojo/seekyfoxx/PKGBUILD"
         # install modular if not installed
         if not self.modular:
             # download PKGBUILD
-            urllib.request.urlretrieve(url, f"{self.working_dir}PKGBUILD")
+            if not os.path.exists(f"{self.working_dir}/PKGBUILD"):
+                urllib.request.urlretrieve(url, f"{self.working_dir}/PKGBUILD")
+
             subprocess.run(f"cd {self.working_dir} && makepkg -si", shell=True)
 
         # authenticate in modular
@@ -162,18 +164,18 @@ class Mojo(object):
         url2 = "https://ftp.debian.org/debian/pool/main/libe/libedit/libedit2_3.1-20221030-2_amd64.deb"
 
         # download ncurses lib
-        urllib.request.urlretrieve(url1, f"{self.working_dir}libncurses.deb")
-        urllib.request.urlretrieve(url2,f"{self.working_dir}libedit.deb")
+        urllib.request.urlretrieve(url1, f"{self.working_dir}/libncurses.deb")
+        urllib.request.urlretrieve(url2,f"{self.working_dir}/libedit.deb")
 
         subprocess.run(f"cd {self.working_dir} && ar -vx libncurses.deb && tar -xf data.tar.xz", shell=True)
         subprocess.run(f"cd {self.working_dir} && ar -vx libedit.deb && tar -xf data.tar.xz", shell=True)
 
         # copy libs
         if self.install_global:
-            shutil.copy(f"{self.working_dir}lib/{self.arch}/libncurses.so.6.4", "/lib/libncurses.so.6.4")
-            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libform.so.6.4", "/usr/lib/libform.so.6.4")
-            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libpanel.so.6.4", "/usr/lib/libpanel.so.6.4")
-            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libedit.so.2.0.70", "/usr/lib/libedit.so.2.0.70")
+            shutil.copy(f"{self.working_dir}/lib/{self.arch}/libncurses.so.6.4", "/lib/libncurses.so.6.4")
+            shutil.copy(f"{self.working_dir}/usr/lib/{self.arch}/libform.so.6.4", "/usr/lib/libform.so.6.4")
+            shutil.copy(f"{self.working_dir}/usr/lib/{self.arch}/libpanel.so.6.4", "/usr/lib/libpanel.so.6.4")
+            shutil.copy(f"{self.working_dir}/usr/lib/{self.arch}/libedit.so.2.0.70", "/usr/lib/libedit.so.2.0.70")
 
             os.symlink("/lib/libncurses.so.6.4", "/lib/libncurses.so.6")
             os.symlink("/usr/lib/libform.so.6.4", "/usr/lib/libform.so.6")
@@ -188,10 +190,10 @@ class Mojo(object):
             except FileExistsError:
                 pass
 
-            shutil.copy(f"{self.working_dir}lib/{self.arch}/libncurses.so.6.4", f"{self.mojo_lib_path}/libncurses.so.6")
-            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libform.so.6.4", f"{self.mojo_lib_path}/libform.so.6")
-            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libpanel.so.6.4", f"{self.mojo_lib_path}/libpanel.so.6")
-            shutil.copy(f"{self.working_dir}usr/lib/{self.arch}/libedit.so.2.0.70", f"{self.mojo_lib_path}/libedit.so.2")
+            shutil.copy(f"{self.working_dir}/lib/{self.arch}/libncurses.so.6.4", f"{self.mojo_lib_path}/libncurses.so.6")
+            shutil.copy(f"{self.working_dir}/usr/lib/{self.arch}/libform.so.6.4", f"{self.mojo_lib_path}/libform.so.6")
+            shutil.copy(f"{self.working_dir}/usr/lib/{self.arch}/libpanel.so.6.4", f"{self.mojo_lib_path}/libpanel.so.6")
+            shutil.copy(f"{self.working_dir}/usr/lib/{self.arch}/libedit.so.2.0.70", f"{self.mojo_lib_path}/libedit.so.2")
 
     def install_mojo(self) -> None:
         # install mojo
@@ -277,7 +279,7 @@ class Mojo(object):
                     sys.stdout.write("wrote lib path")
                     self.rc_file.write(f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/{self.mojo_lib_path_from_home}\n")
 
-                if path is None or not self.hasstr("~/.modular/pkg/packages.modular.com_mojo/bin/", path) and not self.hasstr(f"{self.home}.modular/pkg/packages.modular.com_mojo/bin/", path):
+                if path is None or not self.hasstr("~/.modular/pkg/packages.modular.com_mojo/bin/", path) and not self.hasstr(f"{self.home}/.modular/pkg/packages.modular.com_mojo/bin/", path):
                     sys.stdout.write("wrote path")
                     self.rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 
