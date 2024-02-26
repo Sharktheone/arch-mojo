@@ -29,33 +29,13 @@ class Mojo(object):
         self.token = ""
         self.modular = shutil.which("modular") is not None
         self.handle_args()
+        self.is_authenticated()
         self.fedora_os()
         self.install_modular()
-        self.is_authenticated()
         self.ncurses()
         self.install_mojo()
         self.rc_path()
         self.handle_rc()
-
-    def hasstr(self, target: str, original: str) -> bool:
-        if not isinstance(target, str) or not isinstance(original, str):
-            return False
-
-        elif len(target) > len(original):
-            return False
-        
-        else:
-            start = 0
-            stop = len(target)
-
-            while start < len(original):
-                if original[start:stop] == target:
-                    return True
-                start += 1
-                stop += 1
-
-            else:
-                return False
 
     def _help(self) -> int:
         sys.stdout.write("Usage: python3 install.py [options]\n")
@@ -71,7 +51,10 @@ class Mojo(object):
     def is_authenticated(self) -> None:
         if self.modular:
             result = subprocess.run(["modular", "config-list"], capture_output=True).stdout.decode("utf-8")
-            self.authenticated = self.hasstr("user.id", result)
+            self.authenticated = "user.id" in result
+        else:
+            self.authenticated = False
+        return None
 
     def handle_args(self) -> None:
         for arg in self.args:
@@ -123,7 +106,7 @@ class Mojo(object):
 
         try:
             os.makedirs(self.working_dir)
-        except OSError:
+        except FileExistsError:
             pass
 
     def fedora_os(self) -> None:
@@ -142,13 +125,13 @@ class Mojo(object):
                 shutil.copy(f"{self.working_dir}/lib/{self.arch}/libtinfo.so.6.4", f"{self.mojo_lib_path}/libtinfo.so.6")
 
     def install_modular(self) -> None:
-        url = "https://raw.githubusercontent.com/sneekyfoxx/arch-mojo/seekyfoxx/PKGBUILD"
+        url = "https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/aur/modular/PKGBUILD"
         # install modular if not installed
         if not self.modular:
             # download PKGBUILD
             if not os.path.exists(f"{self.working_dir}/PKGBUILD"):
                 urllib.request.urlretrieve(url, f"{self.working_dir}/PKGBUILD")
-
+            
             subprocess.run(f"cd {self.working_dir} && makepkg -si", shell=True)
 
         # authenticate in modular
@@ -267,7 +250,7 @@ class Mojo(object):
         else:
             with open(self.rc_pth, "a") as self.rc_file:
                 if self.rc_file is None:
-                    sys.stdout.write(f"C\nould not open {self.rc_pth}, skipping...")
+                    sys.stdout.write(f"\nCould not open {self.rc_pth}, skipping...")
                     self.print_manual_instructions()
                     exit(0)
 
@@ -275,11 +258,11 @@ class Mojo(object):
                 ld_path = os.getenv("LD_LIBRARY_PATH")
                 path = os.getenv("PATH")
 
-                if ld_path is None or not self.hasstr(f"~/{self.mojo_lib_path_from_home}", ld_path) and not self.hasstr(self.mojo_lib_path, ld_path):
+                if ld_path is None or not f"~/{self.mojo_lib_path_from_home}" in ld_path and not self.mojo_lib_path in ld_path:
                     sys.stdout.write("wrote lib path")
                     self.rc_file.write(f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/{self.mojo_lib_path_from_home}\n")
 
-                if path is None or not self.hasstr("~/.modular/pkg/packages.modular.com_mojo/bin/", path) and not self.hasstr(f"{self.home}/.modular/pkg/packages.modular.com_mojo/bin/", path):
+                if path is None or not "~/.modular/pkg/packages.modular.com_mojo/bin/" in path and not f"{self.home}/.modular/pkg/packages.modular.com_mojo/bin/" in path:
                     sys.stdout.write("wrote path")
                     self.rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 
