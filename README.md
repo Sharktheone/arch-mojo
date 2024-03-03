@@ -6,7 +6,7 @@ get mojo working.
 ## Arch Installation
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py)
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py)
 ```
 
 <details>
@@ -18,13 +18,13 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 Install mojo globally:
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py) --global
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --global
 ```
 
 Change working directory:
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py) --dir=/tmp/arch-mojo
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --dir=/tmp/arch-mojo
 ```
 
 </details>
@@ -34,7 +34,7 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 First install modular with the official instructions [Modular](https://developer.modular.com/download)
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py) --fedora
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --fedora
 ```
 
 <details>
@@ -46,13 +46,13 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 Install mojo globally:
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py) --global --fedora
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --global --fedora
 ```
 
 Change working directory:
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/install.py) --dir=/tmp/arch-mojo --fedora
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --dir=/tmp/arch-mojo --fedora
 ```
 
 </details>
