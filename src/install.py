@@ -35,6 +35,7 @@ class Mojo(object):
         self.install_modular()
         self.ncurses()
         self.install_mojo()
+        self.print_failture_information()
         self.handle_rc()
 
     def _help(self) -> int:
@@ -125,17 +126,20 @@ class Mojo(object):
                 shutil.copy(f"{self.working_dir}/lib/{self.arch}/libtinfo.so.6.4", f"{self.mojo_lib_path}/libtinfo.so.6")
 
     def install_modular(self) -> None:
-        url = "https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/aur/modular/PKGBUILD"
+        repo = "https://github.com/Sharktheone/arch-mojo"
         # install modular if not installed
         if not self.modular:
+            if shutil.which("git") is None:
+                sys.stdout.write("\nPlease install git to continue")
+                exit(1)
             # download PKGBUILD
-            if not os.path.exists(f"{self.working_dir}/PKGBUILD"):
-                urllib.request.urlretrieve(url, f"{self.working_dir}/PKGBUILD")
+            if not os.path.exists(f"{self.working_dir}/source/.git"):
+                os.makedirs(f"{self.working_dir}/source")
+                subprocess.run(f"git clone {repo} {self.working_dir}/source", shell=True)
             else:
-                os.remove(f"{self.working_dir}/PKGBUILD")
-                urllib.request.urlretrieve(url, f"{self.working_dir}/PKGBUILD")
+                subprocess.run(f"cd {self.working_dir}/source && git pull", shell=True)
             
-            subprocess.run(f"cd {self.working_dir} && makepkg -si", shell=True)
+            subprocess.run(f"cd {self.working_dir}/source/aur/modular && makepkg -si", shell=True)
 
         # authenticate in modular
         if not self.authenticated:
@@ -276,6 +280,15 @@ class Mojo(object):
                         self.rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 
             sys.stdout.write(f"\nPlease restart your shell or run `source {self.rc_path}` to complete the installation\n")
+
+    def print_failture_information(self) -> None:
+        sys.stdout.write("\n\033[41;37mTL;DR: If you see errors, ignore them or report them to https://https://github.com/Sharktheone/arch-mojo and restart your shell\033[0m\n")
+        sys.stdout.write("\n\033[91mPlease note that you might be seeing some errors about some components that weren't installed correctly\033[0m\n")
+        sys.stdout.write("\n\033[91mFor more information see here: https://github.com/Sharktheone/arch-mojo?tab=readme-ov-file#missing-shared-libs\033[0m\n")
+        sys.stdout.write("\n\033[91mPlease do not report any installation errors to Modular, as this is not an official installation method\033[0m\n")
+        sys.stdout.write("\n\033[91mIf you encounter any issues, please report them to https://github.com/Sharktheone/arch-mojo/issues\033[0m\n")
+        sys.stdout.write("It would also be nice if you starred the repo, thanks! ❤️\n")
+
 
 
 if __name__ == "__main__":
