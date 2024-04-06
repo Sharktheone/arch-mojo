@@ -5,6 +5,8 @@ get mojo working.
 
 ## Arch Installation
 
+You can install mojo either with an AUR helper like `yay` or `paru` by installing the `mojo` package or doing it manually with the following command.
+
 ```bash
 python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py)
 ```
@@ -56,3 +58,15 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 ```
 
 </details>
+
+
+### Missing shared libs
+
+You might get an error about a missing shared library `libpanel.so.6` when mojo is self testing.
+That's because modular and python ignores the `LD_LIBRARY_PATH` environment variable.
+If you use `mojo` itself it should be set (after you restarted your terminal).
+If not add it to your `.bashrc` or `.zshrc`:
+
+```bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo
+```
