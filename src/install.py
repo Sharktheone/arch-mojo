@@ -125,17 +125,20 @@ class Mojo(object):
                 shutil.copy(f"{self.working_dir}/lib/{self.arch}/libtinfo.so.6.4", f"{self.mojo_lib_path}/libtinfo.so.6")
 
     def install_modular(self) -> None:
-        url = "https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/aur/modular/PKGBUILD"
+        repo = "https://github.com/Sharktheone/arch-mojo"
         # install modular if not installed
         if not self.modular:
+            if shutil.which("git") is None:
+                sys.stdout.write("\nPlease install git to continue")
+                exit(1)
             # download PKGBUILD
-            if not os.path.exists(f"{self.working_dir}/PKGBUILD"):
-                urllib.request.urlretrieve(url, f"{self.working_dir}/PKGBUILD")
+            if not os.path.exists(f"{self.working_dir}/source/.git"):
+                os.makedirs(f"{self.working_dir}/source")
+                subprocess.run(f"git clone {repo} {self.working_dir}/source", shell=True)
             else:
-                os.remove(f"{self.working_dir}/PKGBUILD")
-                urllib.request.urlretrieve(url, f"{self.working_dir}/PKGBUILD")
+                subprocess.run(f"cd {self.working_dir}/source && git pull", shell=True)
             
-            subprocess.run(f"cd {self.working_dir} && makepkg -si", shell=True)
+            subprocess.run(f"cd {self.working_dir}/source/aur/modular && makepkg -si", shell=True)
 
         # authenticate in modular
         if not self.authenticated:
