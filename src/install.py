@@ -35,6 +35,7 @@ class Mojo(object):
         self.install_modular()
         self.ncurses()
         self.install_mojo()
+        self.print_failture_information()
         self.handle_rc()
 
     def _help(self) -> int:
@@ -279,6 +280,15 @@ class Mojo(object):
                         self.rc_file.write("export PATH=$PATH:~/.modular/pkg/packages.modular.com_mojo/bin/\n")
 
             sys.stdout.write(f"\nPlease restart your shell or run `source {self.rc_path}` to complete the installation\n")
+
+    def print_failture_information(self) -> None:
+        sys.stdout.write("\n\033[41;37mTL;DR: If you see errors, ignore them or report them to https://https://github.com/Sharktheone/arch-mojo and restart your shell\033[0m\n")
+        sys.stdout.write("\n\033[91mPlease note that you might be seeing some errors about some components that weren't installed correctly\033[0m\n")
+        sys.stdout.write("\n\033[91mFor more information see here: https://github.com/Sharktheone/arch-mojo?tab=readme-ov-file#missing-shared-libs\033[0m\n")
+        sys.stdout.write("\n\033[91mPlease do not report any installation errors to Modular, as this is not an official installation method\033[0m\n")
+        sys.stdout.write("\n\033[91mIf you encounter any issues, please report them to https://github.com/Sharktheone/arch-mojo/issues\033[0m\n")
+        sys.stdout.write("It would also be nice if you starred the repo, thanks! ❤️\n")
+
 
 
 if __name__ == "__main__":
