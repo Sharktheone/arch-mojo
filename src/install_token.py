@@ -39,7 +39,7 @@ class Mojo(object):
         self.handle_rc()
 
     def _help(self) -> int:
-        sys.stdout.write("Usage: python3 install.py [options]\n")
+        sys.stdout.write("Usage: python3 install_token.py [options]\n")
         sys.stdout.write("Options:\n")
         sys.stdout.write("  --dir=<path>  | -d=<path>  : Set the working directory\n")
         sys.stdout.write("  --global      | -g         : Install the libs globally\n")
