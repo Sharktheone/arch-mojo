@@ -20,6 +20,19 @@ def print_help():
     exit(0)
 
 
+def get_rc_path() -> str:
+    shell = os.getenv("SHELL")
+    if shell is not None:
+        match shell.split("/")[-1]:
+            case "bash":
+                return f"~/.bashrc"
+            case "zsh":
+                return "~/.zshrc"
+            case _:
+                sys.stderr.write(f"E\033[91mrror: Shell {shell} not supported\033[0m\n")
+                exit(1)
+
+
 class MojoLibs:
     def __init__(self):
         self.install_dir = INSTALL_DIR
@@ -29,7 +42,7 @@ class MojoLibs:
         self.install_libs()
         self.print_failture_information()
 
-        #TODO: Add lib folder to LD_LIBRARY_PATH
+        self.add_lib_path()
 
     def handle_args(self):
         skip_next = False
@@ -96,13 +109,33 @@ class MojoLibs:
 
     def print_failture_information(self) -> None:
         sys.stdout.write(
-            "\n\033[41;37mTL;DR: If you see errors, ignore them or report them to https://https://github.com/Sharktheone/arch-mojo and restart your shell\033[0m\n")
+            "\n\033[41;37mTL;DR: If you see errors, ignore them or report them to "
+            "https://https://github.com/Sharktheone/arch-mojo and restart your shell\033[0m\n")
         sys.stdout.write(
-            "\n\033[91mPlease note that you might be seeing some errors about some components that weren't installed correctly\033[0m\n")
+            "\n\033[91mPlease note that you might be seeing some errors about some components that weren't installed "
+            "correctly\033[0m\n")
         sys.stdout.write(
-            "\n\033[91mFor more information see here: https://github.com/Sharktheone/arch-mojo?tab=readme-ov-file#missing-shared-libs\033[0m\n")
+            "\n\033[91mFor more information see here: "
+            "https://github.com/Sharktheone/arch-mojo?tab=readme-ov-file#missing-shared-libs\033[0m\n")
         sys.stdout.write(
-            "\n\033[91mPlease do not report any installation errors to Modular, as this is not an official installation method\033[0m\n")
+            "\n\033[91mPlease do not report any installation errors to Modular, as this is not an official "
+            "installation method\033[0m\n")
         sys.stdout.write(
-            "\n\033[91mIf you encounter any issues, please report them to https://github.com/Sharktheone/arch-mojo/issues\033[0m\n")
+            "\n\033[91mIf you encounter any issues, please report them to "
+            "https://github.com/Sharktheone/arch-mojo/issues\033[0m\n")
         sys.stdout.write("It would also be nice if you starred the repo, thanks! ❤️\n")
+
+    def add_lib_path(self):
+        lib_path = os.getenv("LD_LIBRARY_PATH")
+
+        # check if the path is already in the LD_LIBRARY_PATH
+        if lib_path is not None:
+            paths = lib_path.split(":")
+
+            for p in paths:
+                if os.path.samefile(p, self.install_dir):
+                    return
+
+        path = get_rc_path()
+        with os.open(path, os.O_APPEND) as f:
+            f.write(f"export LD_LIBRARY_PATH={self.install_dir}:$LD_LIBRARY_PATH\n")
