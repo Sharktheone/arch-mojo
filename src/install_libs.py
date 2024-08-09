@@ -139,8 +139,15 @@ class MojoLibs:
         if lib_path is not None:
             paths = lib_path.split(":")
 
+            install_dir = os.path.abspath(self.install_dir)
+            install_dir = os.path.expanduser(install_dir)
+            install_dir = os.path.expandvars(install_dir)
+
             for p in paths:
-                if os.path.samefile(p, self.install_dir):
+                p = os.path.abspath(p)
+                p = os.path.expanduser(p)
+                p = os.path.expandvars(p)
+                if p == install_dir:
                     return
 
         path = get_rc_path()
