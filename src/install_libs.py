@@ -29,7 +29,7 @@ def get_rc_path() -> str:
             case "zsh":
                 return "~/.zshrc"
             case _:
-                sys.stderr.write(f"E\033[91mrror: Shell {shell} not supported\033[0m\n")
+                sys.stderr.write(f"\033[91mError: Shell {shell} not supported\033[0m\n")
                 exit(1)
 
 
@@ -152,3 +152,5 @@ class MojoLibs:
 
 if __name__ == "__main__":
     MojoLibs()
+
+    print("Please restart your shell or re-soruce your shell configuration file")
