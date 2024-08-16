@@ -28,6 +28,8 @@ def get_rc_path() -> str:
                 return f"~/.bashrc"
             case "zsh":
                 return "~/.zshrc"
+            case "fish":
+                return "~/.config/fish/config.fish"
             case _:
                 sys.stderr.write(f"\033[91mError: Shell {shell} not supported\033[0m\n")
                 exit(1)
@@ -36,19 +38,24 @@ def get_rc_path() -> str:
 def print_failture_information() -> None:
     sys.stdout.write(
         "\n\033[41;37mTL;DR: If you see errors, ignore them or report them to "
-        "https://https://github.com/Sharktheone/arch-mojo and restart your shell\033[0m\n")
+        "https://https://github.com/Sharktheone/arch-mojo and restart your shell\033[0m\n"
+    )
     sys.stdout.write(
         "\n\033[91mPlease note that you might be seeing some errors about some components that weren't installed "
-        "correctly\033[0m\n")
+        "correctly\033[0m\n"
+    )
     sys.stdout.write(
         "\n\033[91mFor more information see here: "
-        "https://github.com/Sharktheone/arch-mojo?tab=readme-ov-file#missing-shared-libs\033[0m\n")
+        "https://github.com/Sharktheone/arch-mojo?tab=readme-ov-file#missing-shared-libs\033[0m\n"
+    )
     sys.stdout.write(
         "\n\033[91mPlease do not report any installation errors to Modular, as this is not an official "
-        "installation method\033[0m\n")
+        "installation method\033[0m\n"
+    )
     sys.stdout.write(
         "\n\033[91mIf you encounter any issues, please report them to "
-        "https://github.com/Sharktheone/arch-mojo/issues\033[0m\n")
+        "https://github.com/Sharktheone/arch-mojo/issues\033[0m\n"
+    )
     sys.stdout.write("It would also be nice if you starred the repo, thanks! ❤️\n")
 
 
@@ -117,8 +124,16 @@ class MojoLibs:
         urllib.request.urlretrieve(libncruses, os.path.join(TEMP_DIR, "libncurses.deb"))
         urllib.request.urlretrieve(libedit, os.path.join(TEMP_DIR, "libedit.deb"))
 
-        subprocess.run(f"cd {TEMP_DIR} && ar -vx libncurses.deb && tar -xf data.tar.xz", shell=True, check=True)
-        subprocess.run(f"cd {TEMP_DIR} && ar -vx libedit.deb && tar -xf data.tar.xz", shell=True, check=True)
+        subprocess.run(
+            f"cd {TEMP_DIR} && ar -vx libncurses.deb && tar -xf data.tar.xz",
+            shell=True,
+            check=True,
+        )
+        subprocess.run(
+            f"cd {TEMP_DIR} && ar -vx libedit.deb && tar -xf data.tar.xz",
+            shell=True,
+            check=True,
+        )
 
         try:
             os.makedirs(self.install_dir)
@@ -127,10 +142,22 @@ class MojoLibs:
 
         # move the needed libraries
 
-        shutil.copy(f"{TEMP_DIR}/lib/{self.arch}/libncurses.so.6.4", os.path.join(self.install_dir, "libncurses.so.6"))
-        shutil.copy(f"{TEMP_DIR}/usr/lib/{self.arch}/libform.so.6.4", os.path.join(self.install_dir, "libform.so.6"))
-        shutil.copy(f"{TEMP_DIR}/usr/lib/{self.arch}/libpanel.so.6.4", os.path.join(self.install_dir, "libpanel.so.6"))
-        shutil.copy(f"{TEMP_DIR}/usr/lib/{self.arch}/libedit.so.2.0.70", os.path.join(self.install_dir, "libedit.so.2"))
+        shutil.copy(
+            f"{TEMP_DIR}/lib/{self.arch}/libncurses.so.6.4",
+            os.path.join(self.install_dir, "libncurses.so.6"),
+        )
+        shutil.copy(
+            f"{TEMP_DIR}/usr/lib/{self.arch}/libform.so.6.4",
+            os.path.join(self.install_dir, "libform.so.6"),
+        )
+        shutil.copy(
+            f"{TEMP_DIR}/usr/lib/{self.arch}/libpanel.so.6.4",
+            os.path.join(self.install_dir, "libpanel.so.6"),
+        )
+        shutil.copy(
+            f"{TEMP_DIR}/usr/lib/{self.arch}/libedit.so.2.0.70",
+            os.path.join(self.install_dir, "libedit.so.2"),
+        )
 
     def add_lib_path(self):
         lib_path = os.getenv("LD_LIBRARY_PATH")
@@ -151,7 +178,7 @@ class MojoLibs:
                     return
 
         path = get_rc_path()
-        
+
         path = os.path.expanduser(path)
         with open(path, "a") as f:
             f.write(f"export LD_LIBRARY_PATH={self.install_dir}:$LD_LIBRARY_PATH\n")
