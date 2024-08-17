@@ -68,5 +68,5 @@ If you use `mojo` itself it should be set (after you restarted your terminal).
 If not add it to your `.bashrc` or `.zshrc`:
 
 ```bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/mojo
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib/arch-mojo
 ```
