@@ -155,6 +155,7 @@ class MojoLibs:
         path = get_rc_path()
         path = os.path.expanduser(path)
         shell = os.getenv("SHELL")
+        command = None
         if shell is not None:
             if "fish" in shell:
                 command = f"set -x LD_LIBRARY_PATH {self.install_dir} $LD_LIBRARY_PATH\n"
@@ -172,3 +173,4 @@ if __name__ == "__main__":
     MojoLibs()
 
     print("Please restart your shell or re-soruce your shell configuration file")
+
