@@ -28,6 +28,8 @@ def get_rc_path() -> str:
                 return f"~/.bashrc"
             case "zsh":
                 return "~/.zshrc"
+            case "fish":
+                return "~/.config/fish/config.fish"
             case _:
                 sys.stderr.write(f"\033[91mError: Shell {shell} not supported\033[0m\n")
                 exit(1)
@@ -151,10 +153,20 @@ class MojoLibs:
                     return
 
         path = get_rc_path()
-        
         path = os.path.expanduser(path)
+        shell = os.getenv("SHELL")
+        command = None
+        if shell is not None:
+            if "fish" in shell:
+                command = f"set -x LD_LIBRARY_PATH {self.install_dir} $LD_LIBRARY_PATH\n"
+            else:  # Default to Bash/Zsh syntax
+                command = f"export LD_LIBRARY_PATH={self.install_dir}:$LD_LIBRARY_PATH\n"
+        else:
+            sys.stderr.write(f"\033[91mError: Unable to detect shell. Please manually add the following to your shell configuration:\n{command}\033[0m\n")
+            return
+        
         with open(path, "a") as f:
-            f.write(f"export LD_LIBRARY_PATH={self.install_dir}:$LD_LIBRARY_PATH\n")
+            f.write(command)
 
 
 if __name__ == "__main__":
