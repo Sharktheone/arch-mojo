@@ -17,12 +17,6 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 ### Options:
 
 </summary>
-Install mojo globally:
-
-```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install_token.py) --global
-```
-
 Change working directory:
 
 ```bash
@@ -45,12 +39,6 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 ### Options:
 
 </summary>
-Install mojo globally:
-
-```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install_token.py) --global --fedora
-```
-
 Change working directory:
 
 ```bash
