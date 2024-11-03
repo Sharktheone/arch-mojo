@@ -8,7 +8,7 @@ get mojo working.
 You can install mojo either with an AUR helper like `yay` or `paru` by installing the `mojo` package or doing it manually with the following command.
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py)
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install_libs.py)
 ```
 
 <details>
@@ -20,13 +20,13 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 Install mojo globally:
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --global
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install_token.py) --global
 ```
 
 Change working directory:
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --dir=/tmp/arch-mojo
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install_libs.py) --dir=/tmp/arch-mojo
 ```
 
 </details>
@@ -36,7 +36,7 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 First install modular with the official instructions [Modular](https://developer.modular.com/download)
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --fedora
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install_libs.py) --fedora
 ```
 
 <details>
@@ -48,13 +48,13 @@ python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/
 Install mojo globally:
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --global --fedora
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install_token.py) --global --fedora
 ```
 
 Change working directory:
 
 ```bash
-python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install.py) --dir=/tmp/arch-mojo --fedora
+python <(curl -sSL https://raw.githubusercontent.com/Sharktheone/arch-mojo/main/src/install_libs.py) --dir=/tmp/arch-mojo --fedora
 ```
 
 </details>
