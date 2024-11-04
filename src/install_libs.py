@@ -38,7 +38,7 @@ def get_rc_path() -> str:
 def print_failture_information() -> None:
     sys.stdout.write(
         "\n\033[41;37mTL;DR: If you see errors, ignore them or report them to "
-        "https://https://github.com/Sharktheone/arch-mojo and restart your shell\033[0m\n")
+        "https://github.com/Sharktheone/arch-mojo and restart your shell\033[0m\n")
     sys.stdout.write(
         "\n\033[91mPlease note that you might be seeing some errors about some components that weren't installed "
         "correctly\033[0m\n")
