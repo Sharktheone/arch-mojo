@@ -1,0 +1,12 @@
+pkgbase = magic-cli
+	pkgdesc = Magic package manager for Python and Mojo
+	pkgver = 0.6.3
+	pkgrel = 1
+	url = https://docs.modular.com/max/get-started/
+	install = magic.install
+	arch = x86_64
+	license = custom:modular
+	source = https://dl.modular.com/public/magic/raw/versions/0.6.3/magic-x86_64-unknown-linux-musl
+	sha256sums = 0ecce70ae4a4232156aa94e4795af2e715135953fb9f339d2f5e7f4ffbb60272
+
+pkgname = magic-cli

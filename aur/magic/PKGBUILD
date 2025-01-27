@@ -1,0 +1,26 @@
+#Maintainer: Sharktheone <sharktheone@proton.me>
+
+pkgname=magic-cli # name pending
+pkgver=0.6.3
+pkgrel=1
+pkgdesc="Magic package manager for Python and Mojo"
+url="https://docs.modular.com/max/get-started/"
+license=("custom:modular")
+arch=("x86_64")
+repo="magic" # magic / magic-prerelease
+
+source=("https://dl.modular.com/public/$repo/raw/versions/$pkgver/magic-x86_64-unknown-linux-musl")
+sha256sums=("0ecce70ae4a4232156aa94e4795af2e715135953fb9f339d2f5e7f4ffbb60272")
+
+package() {
+    MODULAR_HOME="${MODULAR_HOME:-"$HOME/.modular"}"
+    MODULAR_HOME="${MODULAR_HOME/#\~/$HOME}"
+    BIN_DIR="$MODULAR_HOME/bin"
+
+    mkdir -p "$BIN_DIR"
+
+    mv magic-x86_64-unknown-linux-musl "$BIN_DIR/magic"
+    chmod +x "$BIN_DIR/magic"
+}
+
+install="magic.install"
