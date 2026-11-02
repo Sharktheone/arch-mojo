@@ -148,9 +148,11 @@ class Mojo(object):
             if self.token is None:
                 self.token = getpass("Please enter your Modular auth token: ")
             
-            status = subprocess.run(f"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{self.mojo_lib_path} modular auth {self.token}", shell=True)
+            env = os.environ.copy()
+            env["LD_LIBRARY_PATH"] = f"{os.environ.get('LD_LIBRARY_PATH', '')}:{self.mojo_lib_path}"
+            status = subprocess.run(["modular", "auth", self.token], env=env)
             if status.returncode != 0:
-                sys.stdout.write(f"Failed to authenticate modular using token: '{self.token}'")
+                sys.stdout.write("Failed to authenticate modular")
                 exit(1)
 
     def ncurses(self) -> None:
